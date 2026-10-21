@@ -1,1 +1,37 @@
 
+name: Real-TunnelBench Analysis
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_url:
+        description: "Public URL of the input text file"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  analyze:
+    name: Analyze text file
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Run Real-TunnelBench
+        uses: ./
+        with:
+          source_url: ${{ inputs.source_url }}
+          output_dir: output
+
+      - name: Upload reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: real-tunnelbench-report
+          path: output/
+          if-no-files-found: error
+          retention-days: 7
