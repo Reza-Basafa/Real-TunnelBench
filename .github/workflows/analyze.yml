@@ -94,6 +94,8 @@ jobs:
         run: |
           mkdir -p debug-output
           cp output/working_configs.txt output/working_configs_plain.txt output/configs_ranked.csv output/results.json output/summary.md output/report.pdf debug-output/ 2>/dev/null || true
+          cp output/.core/sing-box.log debug-output/sing-box.log 2>/dev/null || true
+          cp output/.core/*.json debug-output/ 2>/dev/null || true
           git config user.name "arena-bot"
           git config user.email "arena-bot@users.noreply.github.com"
           git add debug-output
