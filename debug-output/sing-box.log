@@ -1,6 +1,6 @@
-[31mERROR[0m[0000] [[38;5;220m2322720204[0m 13ms] connection: open connection to www.gstatic.com:443 using outbound/vless[out-0]: unexpected HTTP response status: 500
-[31mERROR[0m[0000] [[38;5;220m62616012[0m 6ms] connection: open connection to cp.cloudflare.com:80 using outbound/vless[out-0]: unexpected HTTP response status: 500
-[31mERROR[0m[0000] [[38;5;172m1111238556[0m 183ms] connection: open connection to www.gstatic.com:443 using outbound/vless[out-5]: unexpected HTTP response status: 500
-[31mERROR[0m[0000] [[38;5;42m688301338[0m 7ms] connection: open connection to cp.cloudflare.com:80 using outbound/vless[out-5]: unexpected HTTP response status: 500
-[31mERROR[0m[0010] [[38;5;155m187739980[0m 10.6s] connection: open connection to www.gstatic.com:443 using outbound/vless[out-3]: unexpected HTTP response status: 502
-[31mERROR[0m[0020] [[38;5;139m4087670907[0m 10.0s] connection: open connection to cp.cloudflare.com:80 using outbound/vless[out-3]: unexpected HTTP response status: 502
+[31mERROR[0m[0000] [[38;5;142m3525984638[0m 158ms] connection: open connection to www.gstatic.com:443 using outbound/vless[out-2]: unexpected HTTP response status: 500
+[31mERROR[0m[0000] [[38;5;33m4001191400[0m 6ms] connection: open connection to cp.cloudflare.com:80 using outbound/vless[out-2]: unexpected HTTP response status: 500
+[31mERROR[0m[0000] [[38;5;188m2058984620[0m 153ms] connection: open connection to www.gstatic.com:443 using outbound/vless[out-5]: unexpected HTTP response status: 500
+[31mERROR[0m[0000] [[38;5;155m4006501452[0m 7ms] connection: open connection to cp.cloudflare.com:80 using outbound/vless[out-5]: unexpected HTTP response status: 500
+[31mERROR[0m[0010] [[38;5;119m3466315120[0m 10.17s] connection: open connection to www.gstatic.com:443 using outbound/vless[out-6]: unexpected HTTP response status: 502
+[31mERROR[0m[0020] [[38;5;34m2483707922[0m 10.4s] connection: open connection to cp.cloudflare.com:80 using outbound/vless[out-6]: unexpected HTTP response status: 502
