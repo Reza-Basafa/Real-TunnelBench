@@ -157,6 +157,7 @@ class IranProbe:
     reachable: bool = False
     rtt_ms: float = 0.0
     probes: int = 0
+    loss: float = 0.0
     detail: str = ""
     source: str = ""
 

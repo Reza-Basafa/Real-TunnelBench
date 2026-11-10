@@ -121,6 +121,9 @@ def apply_iran_probe(assessment: IranAssessment, probe: IranProbe) -> None:
         return
     if probe.reachable:
         bonus = 25.0 if probe.rtt_ms <= 120 else max(6.0, 25.0 - (probe.rtt_ms - 120) / 12.0)
+        if probe.loss > 0:
+            bonus *= max(0.0, 1.0 - probe.loss / 100.0)
+            assessment.reasons.append(f"packet loss from Iran: {probe.loss:.0f}%")
         assessment.score = min(100.0, assessment.score + bonus)
         assessment.reasons.append(
             f"reachable from an Iranian probe ({probe.rtt_ms:.0f} ms, {probe.probes} probe(s))"
@@ -220,23 +223,36 @@ class IranVantage:
         rtt_values: list[float] = []
         reachable = False
         details: list[str] = []
+        losses: list[float] = []
         for entry in probes:
+            if not isinstance(entry, dict):
+                continue
             probe_info = entry.get("probe") or {}
             measurement_result = entry.get("result") or {}
             city = probe_info.get("city") or probe_info.get("country") or "IR"
+            network = probe_info.get("network") or ""
             status = str(measurement_result.get("status") or "")
             if status == "finished":
                 reachable = True
                 value = _extract_rtt(measurement_result)
                 if value:
                     rtt_values.append(value)
-                details.append(f"{city}: ok")
+                stats = measurement_result.get("stats")
+                loss = 0.0
+                if isinstance(stats, dict) and isinstance(stats.get("loss"), (int, float)):
+                    loss = float(stats["loss"])
+                losses.append(loss)
+                label = f"{city} ({network})" if network else city
+                details.append(
+                    f"{label}: {value:.0f} ms" if value else f"{label}: ok"
+                )
             else:
                 details.append(f"{city}: {status or 'failed'}")
 
         result.probes = len(probes)
         result.reachable = reachable
         result.rtt_ms = sum(rtt_values) / len(rtt_values) if rtt_values else 0.0
+        result.loss = max(losses) if losses else 0.0
         result.detail = "; ".join(details)
         if self.pause:
             time.sleep(self.pause)
@@ -244,17 +260,33 @@ class IranVantage:
 
 
 def _extract_rtt(result: dict) -> float:
-    """Read the round trip time out of a ping result."""
-    timings = result.get("timings") or {}
-    for key in ("avg", "total", "min"):
-        value = timings.get(key)
-        if isinstance(value, (int, float)):
-            return float(value)
-    stats = result.get("stats") or {}
-    for key in ("avg", "total", "min"):
-        value = stats.get(key)
-        if isinstance(value, (int, float)):
-            return float(value)
+    """Read the round trip time out of a ping result.
+
+    Globalping returns the individual round trip times in ``timings`` (a list
+    of ``{"rtt": ...}`` objects) and the aggregated values in ``stats``.
+    """
+    timings = result.get("timings")
+    if isinstance(timings, list):
+        values = [
+            float(item["rtt"])
+            for item in timings
+            if isinstance(item, dict) and isinstance(item.get("rtt"), (int, float))
+        ]
+        if values:
+            return sum(values) / len(values)
+    elif isinstance(timings, dict):
+        for key in ("avg", "total", "min"):
+            value = timings.get(key)
+            if isinstance(value, (int, float)):
+                return float(value)
+
+    stats = result.get("stats")
+    if isinstance(stats, dict):
+        for key in ("avg", "total", "min"):
+            value = stats.get(key)
+            if isinstance(value, (int, float)):
+                return float(value)
+
     return _parse_rtt(str(result.get("rawOutput") or ""))
 
 
