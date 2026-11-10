@@ -13,7 +13,7 @@
 }
 === variant 2: ping + IR ===
 {
-  "id": "27pn6jibRK7XvwJti00021TmE",
+  "id": "2moHSQ22I55KoMwEf00021TmF",
   "probesCount": 2
 }
 === variant 3: http + IR + measurementOptions ===
@@ -29,25 +29,6 @@
     "documentation": "https://globalping.io/docs/api.globalping.io#post-/v1/measurements"
   }
 }
-=== variant 4: no locations (probe list) ===
-[
-  {
-    "version": "0.54.0",
-    "location": {
-      "continent": "EU",
-      "region": "Northern Europe",
-      "country": "FI",
-      "state": null,
-      "city": "Helsinki",
-      "asn": 58061,
-      "latitude": 60.17,
-      "longitude": 24.94,
-      "network": "Scalaxy"
-    },
-    "tags": [
-      "datacenter-network",
-      "u-ishosting"
-    ],
-    "resolvers": [
-      "8.8.8.8",
-      "8.8.
+=== variant 4: full flow ===
+id=2vt5qOndd99Sl7V6q00021TmF
+{"id":"2vt5qOndd99Sl7V6q00021TmF","type":"ping","status":"finished","createdAt":"2026-11-10T16:27:27.022Z","updatedAt":"2026-11-10T16:27:28.308Z","target":"www.example.com","limit":2,"probesCount":2,"locations":[{"country":"IR"}],"measurementOptions":{"protocol":"TCP","port":443},"results":[{"probe":{"continent":"AS","region":"Southern Asia","country":"IR","state":null,"city":"Tehran","asn":202468,"longitude":51.42,"latitude":35.69,"network":"Noyan Abr Arvan","tags":["datacenter-network","u-hatamiarash7"],"resolvers":["private"]},"result":{"status":"finished","rawOutput":"PING www.example.com (104.20.23.154) on port 443.\nReply from www.example.com (104.20.23.154) on port 443: tcp_conn=1 time=74.9 ms\nReply from www.example.com (104.20.23.154) on port 443: tcp_conn=2 time=83.0 ms\nReply from www.example.com (104.20.23.154) on port 443: tcp_conn=3 time=78.7 ms\n\n--- www.example.com (104.20.23.154) ping statistics ---\n3 packets transmitted, 3 received, 0% packet loss, time 1080 ms\nrtt min/avg/max/mdev = 74.893/78.841/82.955/3.293 ms","resolvedAddress":"104.20.23.154","resolvedHostname":"www.example.com","timings":[{"rtt":74.9},{"rtt":83},{"rtt":78.7}],"stats":{"min":74.89,"max":82.95,"avg":78.84,"total":3,"loss":0,"rcv":3,"drop":0}}},{"probe":{"continent":"AS","region":"Southern Asia","country":"IR","state":null,"city":"Tabriz","asn":197207,"longitude":46.29,"latitude":38.08,"network":"Mobile Communication Company of Iran","tags":["eyeball-network","u-Albatrossvpn"],"resolvers":["private"]},"result":{"status":"finished","rawOutput":"PING www.example.com (172.66.147.243) on port 443.\nReply from www.example.com (172.66.147.243) on port 443: tcp_conn=1 time=38.5 ms\nReply from www.example.com (172.66.147.243) on port 443: tcp_conn=2 time=46.7 ms\nReply from www.example.com (172.66.147.243) on port 443: tcp_conn=3 time=56.0 ms\n\n--- www.example.com (172.66.147.243) ping statistics ---\n3 packets transmitted, 3 received, 0% packet loss, time 1060 ms\nrtt min/avg/max/mdev = 38.480/47.062/56.009/7.161 ms","resolvedAddress":"172.66.147.243","resolvedHostname":"www.example.com","timings":[{"rtt":38.5},{"rtt":46.7},{"rtt":56}],"stats":{"min":38.48,"max":56.01,"avg":47.06,"total":3,"loss":0,"rcv":3,"drop":0}}}]}
