@@ -142,7 +142,7 @@ class GlobalpingError(RuntimeError):
 class IranVantage:
     """Measures reachability from probes located in Iran."""
 
-    def __init__(self, timeout: float = 45.0, limit: int = 3, pause: float = 0.4):
+    def __init__(self, timeout: float = 45.0, limit: int = 3, pause: float = 0.8):
         self.timeout = timeout
         self.limit = limit
         self.pause = pause
@@ -185,15 +185,18 @@ class IranVantage:
     # -- public API --------------------------------------------------------
 
     def probe(self, host: str, port: int) -> IranProbe:
-        """Measure whether ``host:port`` is reachable from Iran."""
+        """Measure whether ``host:port`` is reachable from Iran.
+
+        A TCP ping is used on purpose: it opens the very port the client
+        would use, so the result reflects what an Iranian user experiences.
+        """
         result = IranProbe(host=host, port=port, source="globalping")
-        target = f"http://{host}:{port}/"
         payload = {
-            "type": "http",
-            "target": target,
+            "type": "ping",
+            "target": host,
             "locations": [{"country": "IR"}],
             "limit": self.limit,
-            "measurementOptions": {"request": {"method": "HEAD"}},
+            "measurementOptions": {"protocol": "TCP", "port": port, "packets": 3},
         }
         try:
             measurement = self._measure(payload)
@@ -224,16 +227,9 @@ class IranVantage:
             status = str(measurement_result.get("status") or "")
             if status == "finished":
                 reachable = True
-                timings = measurement_result.get("timings") or {}
-                total = timings.get("total")
-                first_byte = timings.get("firstByte")
-                value = first_byte if isinstance(first_byte, (int, float)) else total
-                if isinstance(value, (int, float)):
-                    rtt_values.append(float(value))
-                else:
-                    parsed = _parse_rtt(str(measurement_result.get("rawOutput") or ""))
-                    if parsed:
-                        rtt_values.append(parsed)
+                value = _extract_rtt(measurement_result)
+                if value:
+                    rtt_values.append(value)
                 details.append(f"{city}: ok")
             else:
                 details.append(f"{city}: {status or 'failed'}")
@@ -245,6 +241,21 @@ class IranVantage:
         if self.pause:
             time.sleep(self.pause)
         return result
+
+
+def _extract_rtt(result: dict) -> float:
+    """Read the round trip time out of a ping result."""
+    timings = result.get("timings") or {}
+    for key in ("avg", "total", "min"):
+        value = timings.get(key)
+        if isinstance(value, (int, float)):
+            return float(value)
+    stats = result.get("stats") or {}
+    for key in ("avg", "total", "min"):
+        value = stats.get(key)
+        if isinstance(value, (int, float)):
+            return float(value)
+    return _parse_rtt(str(result.get("rawOutput") or ""))
 
 
 _RTT_PATTERN = re.compile(r"([0-9]+(?:\.[0-9]+)?)\s*ms", re.IGNORECASE)
