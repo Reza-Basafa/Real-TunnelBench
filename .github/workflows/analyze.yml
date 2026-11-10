@@ -5,33 +5,103 @@ on:
   workflow_dispatch:
     inputs:
       source_url:
-        description: "Public URL of the input text file"
+        description: "Public URL of the configuration list"
         required: true
+        type: string
+      max_configs:
+        description: "Maximum number of configurations to test"
+        required: false
+        default: "400"
+        type: string
+      concurrency:
+        description: "Number of configurations measured in parallel"
+        required: false
+        default: "12"
+        type: string
+      timeout_minutes:
+        description: "Overall time budget"
+        required: false
+        default: "45"
+        type: string
+      min_speed_mbps:
+        description: "Minimum download speed of an exported configuration"
+        required: false
+        default: "0.5"
+        type: string
+      max_latency_ms:
+        description: "Maximum latency of an exported configuration"
+        required: false
+        default: "2000"
+        type: string
+      iran_probe:
+        description: "Measure the candidates from Iranian vantage points"
+        required: false
+        default: "auto"
+        type: string
+      keep_all_tested:
+        description: "Export every alive configuration"
+        required: false
+        default: "false"
+        type: string
+      dry_run:
+        description: "Only parse the list, do not test anything"
+        required: false
+        default: "false"
         type: string
 
 permissions:
   contents: read
 
+concurrency:
+  group: tunnelbench-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   analyze:
-    name: Analyze text file
+    name: Test every configuration
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 60
 
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
 
       - name: Run Real-TunnelBench
+        id: bench
         uses: ./
         with:
           source_url: ${{ inputs.source_url }}
           output_dir: output
+          max_configs: ${{ inputs.max_configs }}
+          concurrency: ${{ inputs.concurrency }}
+          timeout_minutes: ${{ inputs.timeout_minutes }}
+          min_speed_mbps: ${{ inputs.min_speed_mbps }}
+          max_latency_ms: ${{ inputs.max_latency_ms }}
+          iran_probe: ${{ inputs.iran_probe }}
+          keep_all_tested: ${{ inputs.keep_all_tested }}
+          dry_run: ${{ inputs.dry_run }}
 
-      - name: Upload reports
+      - name: Upload the results
         uses: actions/upload-artifact@v4
         with:
           name: real-tunnelbench-report
           path: output/
           if-no-files-found: error
           retention-days: 7
+
+      - name: Publish the summary
+        if: always()
+        shell: bash
+        run: |
+          {
+            echo "### Real-TunnelBench"
+            echo ""
+            echo "| Metric | Value |"
+            echo "| --- | --- |"
+            echo "| Tested | ${{ steps.bench.outputs.tested_count }} |"
+            echo "| Alive | ${{ steps.bench.outputs.alive_count }} |"
+            echo "| Exported | ${{ steps.bench.outputs.working_count }} |"
+            echo "| Best speed | ${{ steps.bench.outputs.best_mbps }} Mbps |"
+            echo ""
+            echo "The subscription, the plain list, the CSV ranking, the JSON results and the PDF report are in the \`real-tunnelbench-report\` artifact."
+          } >> "$GITHUB_STEP_SUMMARY"

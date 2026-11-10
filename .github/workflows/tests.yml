@@ -1,0 +1,51 @@
+
+name: Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Unit and integration tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+          python -m pip install pytest
+
+      - name: Download the proxy core
+        run: |
+          set -euo pipefail
+          version="1.14.4"
+          curl -fsSL -o sing-box.tar.gz \
+            "https://github.com/SagerNet/sing-box/releases/download/v${version}/sing-box-${version}-linux-amd64.tar.gz"
+          mkdir -p "$HOME/sing-box"
+          tar -xzf sing-box.tar.gz -C "$HOME/sing-box" --strip-components=1
+          echo "SING_BOX_BINARY=$HOME/sing-box/sing-box" >> "$GITHUB_ENV"
+          "$HOME/sing-box/sing-box" version
+
+      - name: Run the test-suite
+        run: python -m pytest tests -q
+
+      - name: Smoke test the command line interface
+        run: |
+          python src/bench.py --help
+          python src/bench.py --url https://example.com/configs.txt --dry-run --output-dir /tmp/rtb-dry || true
