@@ -1,3 +1,11 @@
+"""Legacy static analyzer.
+
+.. deprecated::
+   This module only inspects the *text* of a configuration list.  The full
+   benchmark (real measurement, Iran aware ranking and PDF report) lives in
+   ``tunnelbench`` and is started with ``python src/bench.py --url <list>``.
+   The script is kept for backwards compatibility with existing workflows.
+"""
 
 from __future__ import annotations
 

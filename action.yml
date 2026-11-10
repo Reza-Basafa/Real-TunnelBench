@@ -1,15 +1,130 @@
 
-name: "Real-TunnelBench Static Analyzer"
-description: "Analyze configuration text structure and generate TXT and PDF reports."
+name: "Real-TunnelBench Live Benchmark"
+description: "Test every proxy configuration of a list with a real proxy core, rank the working ones for Iranian users and export a v2ray subscription plus a PDF report."
+author: "Real-TunnelBench"
 
 inputs:
   source_url:
-    description: "Public HTTP(S) URL of a text file"
+    description: "Public HTTP(S) URL of the configuration list (plain text or base64 subscription)"
     required: true
   output_dir:
-    description: "Directory for generated files"
+    description: "Directory for the generated files"
     required: false
     default: "output"
+  max_configs:
+    description: "Maximum number of configurations to test"
+    required: false
+    default: "400"
+  concurrency:
+    description: "Number of configurations measured in parallel"
+    required: false
+    default: "12"
+  timeout_minutes:
+    description: "Overall time budget of the run"
+    required: false
+    default: "45"
+  min_speed_mbps:
+    description: "Minimum download speed (Mbps) of an exported configuration"
+    required: false
+    default: "0.5"
+  max_latency_ms:
+    description: "Maximum latency (ms) of an exported configuration"
+    required: false
+    default: "2000"
+  latency_samples:
+    description: "Latency samples per configuration"
+    required: false
+    default: "3"
+  speed_test_bytes:
+    description: "Number of bytes downloaded during the speed test"
+    required: false
+    default: "5000000"
+  speed_test_url:
+    description: "Custom speed test URL ({bytes} is replaced by the download size)"
+    required: false
+    default: ""
+  latency_url:
+    description: "Custom latency probe URL"
+    required: false
+    default: ""
+  iran_probe:
+    description: "Measure the candidates from Iranian vantage points (auto, on, off)"
+    required: false
+    default: "auto"
+  iran_probe_limit:
+    description: "How many candidates are probed from Iran"
+    required: false
+    default: "25"
+  core_version:
+    description: "sing-box release used as the proxy core"
+    required: false
+    default: "1.14.4"
+  core_sha256:
+    description: "Expected SHA-256 of the downloaded core archive (optional)"
+    required: false
+    default: ""
+  geo_lookup:
+    description: "Look up the geolocation and the ASN of the entry servers (true, false)"
+    required: false
+    default: "true"
+  dry_run:
+    description: "Only parse the list, do not test anything (true, false)"
+    required: false
+    default: "false"
+  keep_all_tested:
+    description: "Export every alive configuration, not only the fast ones (true, false)"
+    required: false
+    default: "false"
+  include_failed:
+    description: "Also export the configurations that failed (true, false)"
+    required: false
+    default: "false"
+  max_output:
+    description: "Limit the number of exported configurations (0 = no limit)"
+    required: false
+    default: "0"
+  weight_speed:
+    description: "Weight of the throughput axis in the final score"
+    required: false
+    default: "0.50"
+  weight_latency:
+    description: "Weight of the latency axis in the final score"
+    required: false
+    default: "0.20"
+  weight_iran:
+    description: "Weight of the Iran affinity axis in the final score"
+    required: false
+    default: "0.22"
+  weight_stability:
+    description: "Weight of the stability axis in the final score"
+    required: false
+    default: "0.08"
+
+outputs:
+  working_configs_path:
+    description: "Path of the base64 subscription file"
+    value: ${{ steps.benchmark.outputs.working_configs_path }}
+  working_configs_plain_path:
+    description: "Path of the plain text list of the selected URIs"
+    value: ${{ steps.benchmark.outputs.working_configs_plain_path }}
+  report_path:
+    description: "Path of the PDF report"
+    value: ${{ steps.benchmark.outputs.report_path }}
+  results_path:
+    description: "Path of the machine readable results"
+    value: ${{ steps.benchmark.outputs.results_path }}
+  working_count:
+    description: "Number of exported configurations"
+    value: ${{ steps.benchmark.outputs.working_count }}
+  tested_count:
+    description: "Number of tested configurations"
+    value: ${{ steps.benchmark.outputs.tested_count }}
+  alive_count:
+    description: "Number of alive configurations"
+    value: ${{ steps.benchmark.outputs.alive_count }}
+  best_mbps:
+    description: "Best measured download speed in Mbps"
+    value: ${{ steps.benchmark.outputs.best_mbps }}
 
 runs:
   using: "composite"
@@ -21,14 +136,91 @@ runs:
 
     - name: Install dependencies
       shell: bash
-      run: python -m pip install -r "${{ github.action_path }}/requirements.txt"
+      run: python -m pip install --upgrade pip && python -m pip install -r "${{ github.action_path }}/requirements.txt"
 
-    - name: Run static analysis
+    - name: Run the benchmark
+      id: benchmark
       shell: bash
       env:
         SOURCE_URL: ${{ inputs.source_url }}
         OUTPUT_DIR: ${{ inputs.output_dir }}
+        MAX_CONFIGS: ${{ inputs.max_configs }}
+        CONCURRENCY: ${{ inputs.concurrency }}
+        TIMEOUT_MINUTES: ${{ inputs.timeout_minutes }}
+        MIN_SPEED_MBPS: ${{ inputs.min_speed_mbps }}
+        MAX_LATENCY_MS: ${{ inputs.max_latency_ms }}
+        LATENCY_SAMPLES: ${{ inputs.latency_samples }}
+        SPEED_TEST_BYTES: ${{ inputs.speed_test_bytes }}
+        SPEED_TEST_URL: ${{ inputs.speed_test_url }}
+        LATENCY_URL: ${{ inputs.latency_url }}
+        IRAN_PROBE: ${{ inputs.iran_probe }}
+        IRAN_PROBE_LIMIT: ${{ inputs.iran_probe_limit }}
+        CORE_VERSION: ${{ inputs.core_version }}
+        CORE_SHA256: ${{ inputs.core_sha256 }}
+        GEO_LOOKUP: ${{ inputs.geo_lookup }}
+        DRY_RUN: ${{ inputs.dry_run }}
+        KEEP_ALL_TESTED: ${{ inputs.keep_all_tested }}
+        INCLUDE_FAILED: ${{ inputs.include_failed }}
+        MAX_OUTPUT: ${{ inputs.max_output }}
+        WEIGHT_SPEED: ${{ inputs.weight_speed }}
+        WEIGHT_LATENCY: ${{ inputs.weight_latency }}
+        WEIGHT_IRAN: ${{ inputs.weight_iran }}
+        WEIGHT_STABILITY: ${{ inputs.weight_stability }}
       run: |
-        python "${{ github.action_path }}/src/analyzer.py" \
+        set -euo pipefail
+        mkdir -p "$OUTPUT_DIR"
+
+        extra_args=()
+        if [ "${GEO_LOOKUP,,}" = "false" ]; then extra_args+=(--no-geo); fi
+        if [ "${DRY_RUN,,}" = "true" ]; then extra_args+=(--dry-run); fi
+        if [ "${KEEP_ALL_TESTED,,}" = "true" ]; then extra_args+=(--keep-all-tested); fi
+        if [ "${INCLUDE_FAILED,,}" = "true" ]; then extra_args+=(--include-failed); fi
+        if [ -n "${CORE_SHA256}" ]; then export TUNNELBENCH_CORE_SHA256="$CORE_SHA256"; fi
+
+        python "${{ github.action_path }}/src/bench.py" \
           --url "$SOURCE_URL" \
-          --output-dir "$OUTPUT_DIR"
+          --output-dir "$OUTPUT_DIR" \
+          --max-configs "$MAX_CONFIGS" \
+          --concurrency "$CONCURRENCY" \
+          --timeout-minutes "$TIMEOUT_MINUTES" \
+          --min-speed-mbps "$MIN_SPEED_MBPS" \
+          --max-latency-ms "$MAX_LATENCY_MS" \
+          --latency-samples "$LATENCY_SAMPLES" \
+          --speed-test-bytes "$SPEED_TEST_BYTES" \
+          --speed-test-url "$SPEED_TEST_URL" \
+          --latency-url "$LATENCY_URL" \
+          --iran-probe "$IRAN_PROBE" \
+          --iran-probe-limit "$IRAN_PROBE_LIMIT" \
+          --core-version "$CORE_VERSION" \
+          --max-output "$MAX_OUTPUT" \
+          --weight-speed "$WEIGHT_SPEED" \
+          --weight-latency "$WEIGHT_LATENCY" \
+          --weight-iran "$WEIGHT_IRAN" \
+          --weight-stability "$WEIGHT_STABILITY" \
+          ${extra_args[@]+"${extra_args[@]}"}
+
+        python - "$OUTPUT_DIR" >> "$GITHUB_OUTPUT" <<'PY'
+        import json, os, sys
+        directory = sys.argv[1]
+        with open(os.path.join(directory, "results.json"), encoding="utf-8") as handle:
+            payload = json.load(handle)
+        counts = payload.get("counts", {})
+        alive = [item for item in payload.get("results", []) if item.get("alive")]
+        best = max((item.get("download_mbps", 0.0) for item in alive), default=0.0)
+        print(f"working_configs_path={os.path.join(directory, 'working_configs.txt')}")
+        print(f"working_configs_plain_path={os.path.join(directory, 'working_configs_plain.txt')}")
+        print(f"report_path={os.path.join(directory, 'report.pdf')}")
+        print(f"results_path={os.path.join(directory, 'results.json')}")
+        print(f"working_count={counts.get('selected', 0)}")
+        print(f"tested_count={counts.get('tested', 0)}")
+        print(f"alive_count={counts.get('alive', 0)}")
+        print(f"best_mbps={best:.2f}")
+        PY
+
+    - name: Publish the job summary
+      if: always()
+      shell: bash
+      run: |
+        if [ -f "${{ inputs.output_dir }}/summary.md" ]; then
+          cat "${{ inputs.output_dir }}/summary.md" >> "$GITHUB_STEP_SUMMARY"
+        fi
