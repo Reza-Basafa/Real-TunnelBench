@@ -38,6 +38,18 @@ SOCKS می‌سازد و از داخل تونل:
 - **آی‌پی خروجی** و کشور/ASN آن را درمی‌آورد،
 - و مشخص می‌کند کدام کانفیگ **برای اپراتور ایرانی** مناسب است.
 
+### چرا خیلی از کانفیگ‌ها «مرده» به نظر می‌رسند؟
+
+لاگ هستهٔ sing-box خط به خط خوانده و **علت واقعی هر شکست** به کانفیگ
+نسبت داده می‌شود؛ بنابراین گزارش به‌جای «timeout» می‌گوید *چرا* کار نکرد:
+گواهی نامعتبر، عدم تطابق TLS، خطای HTTP یا سرور خاموش.
+
+بخش بزرگی از لیست‌های عمومی از **SNI fronting** استفاده می‌کنند: سرور
+ورودی یک گواهی CDN (مثلاً Fastly) ارائه می‌دهد که با نام درخواست‌شده
+تطابق ندارد. چنین کانفیگی سالم است اما با اعتبارسنجی سخت‌گیرانه رد می‌شود.
+به همین دلیل هر کانفیگی که **فقط** روی گواهی شکست خورده، **یک بار دیگر بدون
+اعتبارسنجی گواهی** اندازه‌گیری می‌شود و اگر زنده بود در خروجی می‌آید.
+
 ## اجرای سریع
 
 ۱. در تب **Actions** روی «Real-TunnelBench Analysis» کلیک کنید.
@@ -161,6 +173,18 @@ detailed PDF report.
 - Everything is explained: the PDF report contains the methodology, the
   scoring weights, the throughput chart, the failure analysis and the
   Iran affinity section.
+
+## Why so many configurations look dead
+
+The log of the proxy core is parsed line by line and the **real reason** of
+every failure is attached to the configuration, so the report explains *why*
+something failed instead of only saying "timeout".
+
+A large part of the public lists relies on **SNI fronting**: the entry
+server presents a CDN certificate that does not match the requested server
+name.  Those configurations are healthy but a strict verification rejects
+them, so every configuration that failed *only* on the certificate is
+measured a second time without the certificate verification.
 
 ## Usage
 
