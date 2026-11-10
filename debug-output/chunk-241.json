@@ -1,0 +1,417 @@
+{
+  "log": {
+    "level": "error",
+    "timestamp": false
+  },
+  "dns": {
+    "servers": [
+      {
+        "type": "local",
+        "tag": "local"
+      }
+    ],
+    "final": "local"
+  },
+  "inbounds": [
+    {
+      "type": "socks",
+      "tag": "in-0",
+      "listen": "127.0.0.1",
+      "listen_port": 20800
+    },
+    {
+      "type": "socks",
+      "tag": "in-1",
+      "listen": "127.0.0.1",
+      "listen_port": 20801
+    },
+    {
+      "type": "socks",
+      "tag": "in-2",
+      "listen": "127.0.0.1",
+      "listen_port": 20802
+    },
+    {
+      "type": "socks",
+      "tag": "in-3",
+      "listen": "127.0.0.1",
+      "listen_port": 20803
+    },
+    {
+      "type": "socks",
+      "tag": "in-4",
+      "listen": "127.0.0.1",
+      "listen_port": 20804
+    },
+    {
+      "type": "socks",
+      "tag": "in-5",
+      "listen": "127.0.0.1",
+      "listen_port": 20805
+    },
+    {
+      "type": "socks",
+      "tag": "in-6",
+      "listen": "127.0.0.1",
+      "listen_port": 20806
+    },
+    {
+      "type": "socks",
+      "tag": "in-7",
+      "listen": "127.0.0.1",
+      "listen_port": 20807
+    },
+    {
+      "type": "socks",
+      "tag": "in-8",
+      "listen": "127.0.0.1",
+      "listen_port": 20808
+    },
+    {
+      "type": "socks",
+      "tag": "in-9",
+      "listen": "127.0.0.1",
+      "listen_port": 20809
+    },
+    {
+      "type": "socks",
+      "tag": "in-10",
+      "listen": "127.0.0.1",
+      "listen_port": 20810
+    },
+    {
+      "type": "socks",
+      "tag": "in-11",
+      "listen": "127.0.0.1",
+      "listen_port": 20811
+    }
+  ],
+  "outbounds": [
+    {
+      "type": "vless",
+      "tag": "out-0",
+      "server": "wwww.qarvian.ir",
+      "server_port": 443,
+      "uuid": "153900df-5824-4b55-98c4-418c5baea523",
+      "packet_encoding": "xudp",
+      "tls": {
+        "enabled": true,
+        "server_name": "firefox.com"
+      },
+      "transport": {
+        "type": "ws",
+        "path": "/",
+        "headers": {
+          "Host": "copy_az_channel_NUFiLTER_7i.global.ssl.fastly.net."
+        }
+      }
+    },
+    {
+      "type": "vless",
+      "tag": "out-1",
+      "server": "fast.cd-tur4.ir",
+      "server_port": 443,
+      "uuid": "1df05cde-34a0-44ce-8059-44a7b1e7782b",
+      "packet_encoding": "xudp",
+      "tls": {
+        "enabled": true,
+        "server_name": "default.ssl.fastly.net",
+        "insecure": true
+      },
+      "transport": {
+        "type": "ws",
+        "path": "/",
+        "headers": {
+          "Host": "bazaryabab.global.ssl.fastly.net"
+        }
+      }
+    },
+    {
+      "type": "vless",
+      "tag": "out-2",
+      "server": "snapp.ir",
+      "server_port": 2087,
+      "uuid": "2402a18b-77f3-4346-db46-4284cb037bb3",
+      "packet_encoding": "xudp",
+      "tls": {
+        "enabled": true,
+        "server_name": "cdn.xelira.ir",
+        "utls": {
+          "enabled": true,
+          "fingerprint": "chrome"
+        }
+      },
+      "transport": {
+        "type": "ws",
+        "path": "/BetForward",
+        "headers": {
+          "Host": "cdn.xelira.ir"
+        }
+      }
+    },
+    {
+      "type": "vless",
+      "tag": "out-3",
+      "server": "24janebi.ir",
+      "server_port": 2083,
+      "uuid": "2c4c513c-5422-4daf-80ce-62b3dde5da54",
+      "packet_encoding": "xudp",
+      "tls": {
+        "enabled": true,
+        "server_name": "jolly-voice-eed5.prisonvpn34.workers.dev",
+        "utls": {
+          "enabled": true,
+          "fingerprint": "chrome"
+        }
+      },
+      "transport": {
+        "type": "ws",
+        "path": "/ws",
+        "headers": {
+          "Host": "jolly-voice-eed5.prisonvpn34.workers.dev"
+        }
+      }
+    },
+    {
+      "type": "vless",
+      "tag": "out-4",
+      "server": "wwww.qarvian.ir",
+      "server_port": 443,
+      "uuid": "37857ebf-94bb-49a0-8ab9-548e64e57311",
+      "packet_encoding": "xudp",
+      "tls": {
+        "enabled": true,
+        "server_name": "google.com"
+      },
+      "transport": {
+        "type": "ws",
+        "path": "/?TELEGRAM--CNETVPN?ed=2560",
+        "headers": {
+          "Host": "azdddaiji5.global.ssl.fastly.net."
+        }
+      }
+    },
+    {
+      "type": "vless",
+      "tag": "out-5",
+      "server": "wwww.qarvian.ir",
+      "server_port": 443,
+      "uuid": "3d9d91c0-0a90-471a-a518-a0ff66a1970a",
+      "packet_encoding": "xudp",
+      "tls": {
+        "enabled": true,
+        "server_name": "cdn.akamai.steamstatic.com"
+      },
+      "transport": {
+        "type": "ws",
+        "path": "/",
+        "headers": {
+          "Host": "copy_az_channel_NUFiLTER_7i.global.ssl.fastly.net."
+        }
+      }
+    },
+    {
+      "type": "vless",
+      "tag": "out-6",
+      "server": "wwww.qarvian.ir",
+      "server_port": 443,
+      "uuid": "3d9d91c0-0a90-471a-a518-a0ff66a1970a",
+      "packet_encoding": "xudp",
+      "tls": {
+        "enabled": true,
+        "server_name": "cdn.akamai.steamstatic.com"
+      },
+      "transport": {
+        "type": "ws",
+        "path": "/",
+        "headers": {
+          "Host": "copy_az_channel_NUFiLTER_17i.global.ssl.fastly.net."
+        }
+      }
+    },
+    {
+      "type": "vless",
+      "tag": "out-7",
+      "server": "wwww.qarvian.ir",
+      "server_port": 443,
+      "uuid": "46cb8a26-0712-4e85-89bf-2538a2788652",
+      "packet_encoding": "xudp",
+      "tls": {
+        "enabled": true,
+        "server_name": "cdn.akamai.steamstatic.com"
+      },
+      "transport": {
+        "type": "ws",
+        "path": "/",
+        "headers": {
+          "Host": "copy_az_channel_NUFiLTER_7i.global.ssl.fastly.net."
+        }
+      }
+    },
+    {
+      "type": "vless",
+      "tag": "out-8",
+      "server": "wwww.qarvian.ir",
+      "server_port": 443,
+      "uuid": "58d2fb1c-7ae2-42c8-8c0d-a393603ebc9f",
+      "packet_encoding": "xudp",
+      "tls": {
+        "enabled": true,
+        "server_name": "cdn.akamai.steamstatic.com"
+      },
+      "transport": {
+        "type": "ws",
+        "path": "/",
+        "headers": {
+          "Host": "copy_az_channel_NUFiLTER_17i.global.ssl.fastly.net."
+        }
+      }
+    },
+    {
+      "type": "vless",
+      "tag": "out-9",
+      "server": "wwww.qarvian.ir",
+      "server_port": 443,
+      "uuid": "58d2fb1c-7ae2-42c8-8c0d-a393603ebc9f",
+      "packet_encoding": "xudp",
+      "tls": {
+        "enabled": true,
+        "server_name": "cdn.akamai.steamstatic.com"
+      },
+      "transport": {
+        "type": "ws",
+        "path": "/",
+        "headers": {
+          "Host": "copy_az_channel_NUFiLTER_7i.global.ssl.fastly.net."
+        }
+      }
+    },
+    {
+      "type": "vless",
+      "tag": "out-10",
+      "server": "www.zula.ir",
+      "server_port": 443,
+      "uuid": "58ea8326-65e1-4848-9ee6-cb6bc8753ba5",
+      "packet_encoding": "xudp",
+      "tls": {
+        "enabled": true,
+        "server_name": "V2ray-Napsternet-Irancell-Iran-Fair.Varzesh3-CDN.site"
+      },
+      "transport": {
+        "type": "grpc",
+        "service_name": "@VPNCUSTOMIZE,@VPNCUSTOMIZE"
+      }
+    },
+    {
+      "type": "vless",
+      "tag": "out-11",
+      "server": "vxc.galardoxtn.ir",
+      "server_port": 443,
+      "uuid": "5f65c1ae-9e7a-48ea-8ecf-6822365cd177",
+      "packet_encoding": "xudp",
+      "tls": {
+        "enabled": true,
+        "server_name": "speedtest.net"
+      },
+      "transport": {
+        "type": "ws",
+        "path": "/",
+        "headers": {
+          "Host": "apiv2.global.ssl.fastly.net"
+        }
+      }
+    }
+  ],
+  "route": {
+    "rules": [
+      {
+        "inbound": [
+          "in-0"
+        ],
+        "action": "route",
+        "outbound": "out-0"
+      },
+      {
+        "inbound": [
+          "in-1"
+        ],
+        "action": "route",
+        "outbound": "out-1"
+      },
+      {
+        "inbound": [
+          "in-2"
+        ],
+        "action": "route",
+        "outbound": "out-2"
+      },
+      {
+        "inbound": [
+          "in-3"
+        ],
+        "action": "route",
+        "outbound": "out-3"
+      },
+      {
+        "inbound": [
+          "in-4"
+        ],
+        "action": "route",
+        "outbound": "out-4"
+      },
+      {
+        "inbound": [
+          "in-5"
+        ],
+        "action": "route",
+        "outbound": "out-5"
+      },
+      {
+        "inbound": [
+          "in-6"
+        ],
+        "action": "route",
+        "outbound": "out-6"
+      },
+      {
+        "inbound": [
+          "in-7"
+        ],
+        "action": "route",
+        "outbound": "out-7"
+      },
+      {
+        "inbound": [
+          "in-8"
+        ],
+        "action": "route",
+        "outbound": "out-8"
+      },
+      {
+        "inbound": [
+          "in-9"
+        ],
+        "action": "route",
+        "outbound": "out-9"
+      },
+      {
+        "inbound": [
+          "in-10"
+        ],
+        "action": "route",
+        "outbound": "out-10"
+      },
+      {
+        "inbound": [
+          "in-11"
+        ],
+        "action": "route",
+        "outbound": "out-11"
+      }
+    ],
+    "final": "out-0",
+    "default_domain_resolver": {
+      "server": "local"
+    }
+  }
+}
