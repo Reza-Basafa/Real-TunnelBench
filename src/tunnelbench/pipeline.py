@@ -14,7 +14,7 @@ from pathlib import Path
 from typing import Callable, Iterable
 
 from . import uris
-from .core import CoreError, CoreProcess, provision_core
+from .core import CoreError, CoreProcess, parse_log_details, provision_core
 from .fetch import FetchError, fetch
 from .geo import CLASS_UNKNOWN, GeoResolver, classify
 from .iran import IranAssessment, IranVantage, apply_iran_probe, assess_static
@@ -310,6 +310,11 @@ def run_benchmark(settings: BenchSettings, logger: Logger | None = None) -> Benc
     return report
 
 
+def _short_detail(detail: str, limit: int = 160) -> str:
+    text = " ".join((detail or "").split())
+    return text[: limit - 1] + "…" if len(text) > limit else text
+
+
 def _count(items: Iterable, key) -> dict[str, int]:
     counts: dict[str, int] = {}
     for item in items:
@@ -328,6 +333,11 @@ def _median(values: list[float]) -> float:
     return (ordered[middle - 1] + ordered[middle]) / 2.0
 
 
+def _is_certificate_error(detail: str) -> bool:
+    text = (detail or "").lower()
+    return "certificate" in text or "x509" in text
+
+
 def _probe_chunk(
     chunk: list[ProxyConfig],
     prober: Prober,
@@ -336,11 +346,56 @@ def _probe_chunk(
     output_dir: Path,
     log: Logger,
 ) -> list[ProbeResult]:
-    """Start sing-box for one chunk and measure every configuration."""
-    from .singbox import build_document
+    """Measure a chunk of configurations.
 
-    document = build_document(chunk, base_port=BASE_PORT)
-    config_path = output_dir / ".core" / f"chunk-{chunk[0].index}.json"
+    A configuration is first measured with the strict settings it was
+    published with.  If the only problem is the certificate - many public
+    configurations use SNI fronting, where the certificate of the entry
+    server does not match the requested server name - it is measured a second
+    time without the certificate verification.
+    """
+    results = _run_pass(chunk, prober, settings, core, output_dir, log, force_insecure=False)
+
+    retryable = [
+        result for result in results if not result.alive and _is_certificate_error(result.detail)
+    ]
+    if retryable:
+        log(
+            f"  {len(retryable)} configuration(s) failed on the certificate - "
+            f"measuring them again without the certificate verification"
+        )
+        retry_chunk = [result.config for result in retryable]
+        relaxed = _run_pass(
+            retry_chunk, prober, settings, core, output_dir, log, force_insecure=True
+        )
+        index = {result.config.index: result for result in results}
+        for result in relaxed:
+            previous = index.get(result.config.index)
+            if previous is not None:
+                result.relaxed = True
+                result.detail = previous.detail
+            if result.alive or previous is None:
+                index[result.config.index] = result
+        results = list(index.values())
+
+    return results
+
+
+def _run_pass(
+    chunk: list[ProxyConfig],
+    prober: Prober,
+    settings: BenchSettings,
+    core,
+    output_dir: Path,
+    log: Logger,
+    force_insecure: bool = False,
+) -> list[ProbeResult]:
+    """Start sing-box for one chunk and measure every configuration."""
+    from .singbox import build_document, outbound_tag
+
+    document = build_document(chunk, base_port=BASE_PORT, force_insecure=force_insecure)
+    suffix = "-relaxed" if force_insecure else ""
+    config_path = output_dir / ".core" / f"chunk-{chunk[0].index}{suffix}.json"
     config_path.parent.mkdir(parents=True, exist_ok=True)
     config_path.write_text(json.dumps(document, indent=2), encoding="utf-8")
 
@@ -368,23 +423,29 @@ def _probe_chunk(
             for future in as_completed(futures):
                 cfg, position = futures[future]
                 try:
-                    results.append(future.result())
+                    result = future.result()
                 except Exception as exc:  # pragma: no cover - defensive
-                    results.append(
-                        ProbeResult(
-                            index=cfg.index,
-                            config=cfg,
-                            alive=False,
-                            error="handshake-failed",
-                            duration_s=0.0,
-                        )
+                    result = ProbeResult(
+                        index=cfg.index,
+                        config=cfg,
+                        alive=False,
+                        error="handshake-failed",
+                        detail=str(exc),
                     )
                     log(f"  ! {cfg.display_name}: probe crashed ({exc})")
+                results.append(result)
                 done += 1
                 if done % 25 == 0:
                     log(f"  ... {done}/{len(chunk)} measured")
     finally:
         process.stop()
+
+    details = parse_log_details(process.read_log())
+    by_position = {result.config.index: result for result in results}
+    for position, cfg in enumerate(chunk):
+        result = by_position.get(cfg.index)
+        if result is not None:
+            result.detail = details.get(outbound_tag(position), "")
 
     return results
 
@@ -538,6 +599,8 @@ def _write_outputs(report: BenchReport, output_dir: Path) -> None:
                 "entry_class",
                 "iran_score",
                 "final_score",
+                "status",
+                "detail",
                 "uri",
             ]
         )
@@ -558,6 +621,8 @@ def _write_outputs(report: BenchReport, output_dir: Path) -> None:
                     result.iran_class,
                     f"{result.iran_score:.1f}",
                     f"{result.final_score:.1f}",
+                    "alive" if result.alive else result.error,
+                    _short_detail(result.detail),
                     result.config.raw,
                 ]
             )
@@ -591,6 +656,8 @@ def _write_outputs(report: BenchReport, output_dir: Path) -> None:
                 "iran_score": round(result.iran_score, 1),
                 "final_score": round(result.final_score, 1),
                 "error": result.error,
+                "detail": result.detail,
+                "relaxed_tls": result.relaxed,
                 "iran_probe": {
                     "available": result.iran_probe.available,
                     "reachable": result.iran_probe.reachable,
@@ -638,6 +705,9 @@ def build_markdown_summary(report: BenchReport) -> str:
     lines.append(f"| کانفیگ‌های نهایی | {len(report.selected)} |")
     lines.append(f"| بهترین سرعت | {report.best_mbps:.2f} Mbps |")
     lines.append(f"| میانه تأخیر | {report.median_latency_ms:.0f} ms |")
+    relaxed = sum(1 for result in report.results if result.relaxed and result.alive)
+    if relaxed:
+        lines.append(f"| کارکرد با TLS بدون اعتبارسنجی گواهی | {relaxed} |")
     lines.append("")
     lines.append("## Summary")
     lines.append("")

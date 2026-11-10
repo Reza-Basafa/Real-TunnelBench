@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import hashlib
 import os
+import re
 import platform
 import shutil
 import socket
@@ -277,6 +278,24 @@ class CoreProcess:
 
     def __exit__(self, *exc_info: object) -> None:
         self.stop()
+
+
+_LOG_PATTERN = re.compile(r"outbound/[a-z_]+\[(out-\d+)\]:\s*(.+)")
+
+
+def parse_log_details(text: str) -> dict[str, str]:
+    """Map the outbound tags of the core log to their last error message.
+
+    sing-box writes lines such as
+    ``open connection to host:443 using outbound/vless[out-3]: tls: ...``
+    which makes it possible to tell the user *why* a configuration failed.
+    """
+    details: dict[str, str] = {}
+    for line in (text or "").splitlines():
+        match = _LOG_PATTERN.search(line)
+        if match:
+            details[match.group(1)] = match.group(2).strip()
+    return details
 
 
 def _port_open(port: int, host: str = "127.0.0.1", timeout: float = 0.3) -> bool:

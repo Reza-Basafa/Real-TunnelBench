@@ -180,6 +180,8 @@ class ProbeResult:
     entry_ips: list[str] = field(default_factory=list)
     iran_probe: IranProbe = field(default_factory=IranProbe)
     error: str = ""
+    detail: str = ""
+    relaxed: bool = False
     duration_s: float = 0.0
     speed_endpoint: str = ""
     latency_samples: list[float] = field(default_factory=list)

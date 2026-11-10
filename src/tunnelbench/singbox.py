@@ -85,13 +85,13 @@ def normalize_short_id(short_id: str) -> str:
     return value
 
 
-def _tls_block(cfg: ProxyConfig) -> dict[str, Any]:
+def _tls_block(cfg: ProxyConfig, force_insecure: bool = False) -> dict[str, Any]:
     tls: dict[str, Any] = {"enabled": True}
 
     server_name = cfg.sni or cfg.host or cfg.server
     if server_name:
         tls["server_name"] = server_name
-    if cfg.allow_insecure:
+    if cfg.allow_insecure or force_insecure:
         tls["insecure"] = True
     if cfg.alpn:
         tls["alpn"] = list(cfg.alpn)
@@ -155,8 +155,14 @@ def _transport_block(cfg: ProxyConfig) -> dict[str, Any] | None:
     return None
 
 
-def build_outbound(cfg: ProxyConfig, tag: str) -> dict[str, Any]:
-    """Build a sing-box outbound object for a single configuration."""
+def build_outbound(cfg: ProxyConfig, tag: str, force_insecure: bool = False) -> dict[str, Any]:
+    """Build a sing-box outbound object for a single configuration.
+
+    ``force_insecure`` disables the certificate verification.  It is used for
+    the second measurement pass: many public configurations rely on SNI
+    fronting, where the certificate of the entry server does not match the
+    requested server name.
+    """
     outbound: dict[str, Any] = {
         "type": _OUTBOUND_TYPES.get(cfg.scheme, cfg.scheme),
         "tag": tag,
@@ -214,9 +220,9 @@ def build_outbound(cfg: ProxyConfig, tag: str) -> dict[str, Any]:
             outbound["password"] = cfg.password
 
     if cfg.scheme in {"hysteria2", "tuic"}:
-        outbound["tls"] = _tls_block(cfg)
+        outbound["tls"] = _tls_block(cfg, force_insecure)
     elif cfg.tls_enabled:
-        outbound["tls"] = _tls_block(cfg)
+        outbound["tls"] = _tls_block(cfg, force_insecure)
 
     transport = _transport_block(cfg)
     if transport is not None:
@@ -249,8 +255,13 @@ def build_document(
     configs: list[ProxyConfig],
     base_port: int = 20800,
     dns_tag: str = "local",
+    force_insecure: bool = False,
 ) -> dict[str, Any]:
-    """Build a complete sing-box document with one SOCKS inbound per config."""
+    """Build a complete sing-box document with one SOCKS inbound per config.
+
+    ``force_insecure`` disables the certificate verification for every
+    outbound of the document.
+    """
     inbounds: list[dict[str, Any]] = []
     outbounds: list[dict[str, Any]] = []
     rules: list[dict[str, Any]] = []
@@ -265,7 +276,7 @@ def build_document(
                 "listen_port": port,
             }
         )
-        outbounds.append(build_outbound(cfg, outbound_tag(offset)))
+        outbounds.append(build_outbound(cfg, outbound_tag(offset), force_insecure))
         rules.append(
             {
                 "inbound": [inbound_tag(offset)],

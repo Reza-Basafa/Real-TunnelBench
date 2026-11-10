@@ -53,6 +53,24 @@ def _escape(value: object) -> str:
     )
 
 
+def _normalise_detail(detail: str, limit: int = 110) -> str:
+    """Shorten a core error message so that it can be grouped."""
+    text = " ".join((detail or "").split())
+    if text.startswith("tls: failed to verify certificate:"):
+        text = "TLS certificate does not match the requested server name"
+    elif text.startswith("unexpected HTTP response status:"):
+        text = "the entry server rejected the request (HTTP status mismatch)"
+    elif text.startswith("remote error: tls: handshake failure"):
+        text = "the entry server aborted the TLS handshake"
+    elif "i/o timeout" in text or "context deadline exceeded" in text:
+        text = "the entry server did not answer in time"
+    elif "connection refused" in text:
+        text = "the entry server refused the connection"
+    elif "no such host" in text:
+        text = "the host name of the entry server does not resolve"
+    return _truncate(text, limit)
+
+
 def _truncate(value: str, length: int) -> str:
     text = str(value)
     if len(text) <= length:
@@ -604,10 +622,28 @@ def build_pdf(report: BenchReport, path: Path) -> Path:
         story.append(
             Paragraph(
                 "Handshake failures are dominated by dead servers, wrong credentials and "
-                "expired subscriptions; they are not a property of the protocol itself.",
+                "expired subscriptions; they are not a property of the protocol itself. "
+                "Configurations that only failed on the certificate are measured a second "
+                "time without the certificate verification, because a lot of public "
+                "configurations rely on SNI fronting.",
                 styles["small"],
             )
         )
+        story.append(Spacer(1, 3 * mm))
+
+        details = [
+            result for result in report.results if not result.alive and result.detail
+        ]
+        if details:
+            grouped: dict[str, int] = {}
+            for result in details:
+                key = _normalise_detail(result.detail)
+                grouped[key] = grouped.get(key, 0) + 1
+            rows = [["Reason reported by the core", "Count"]]
+            for reason, count in sorted(grouped.items(), key=lambda kv: (-kv[1], kv[0]))[:12]:
+                rows.append([Paragraph(_escape(reason), styles["cell"]), str(count)])
+            story.append(Paragraph("Reasons reported by the proxy core", styles["h2"]))
+            story.append(_table(rows, [PAGE_WIDTH - 36 * mm - 25 * mm, 25 * mm], align_right=(1,)))
     else:
         story.append(Paragraph("Every tested configuration was alive.", styles["body"]))
     story.append(Spacer(1, 5 * mm))
@@ -689,7 +725,7 @@ def build_pdf(report: BenchReport, path: Path) -> Path:
 
     # ---------------------------------------------------------------- appendix
     story.append(Paragraph("Appendix A - every measured configuration", styles["h1"]))
-    rows = [["#", "Name", "Proto", "Trans", "Endpoint", "Latency", "Speed", "Exit", "Class", "Score"]]
+    rows = [["#", "Name", "Proto", "Trans", "Endpoint", "Latency", "Speed", "Exit", "Class", "Score", "Reason"]]
     for rank, result in enumerate(report.results, start=1):
         rows.append(
             [
@@ -703,6 +739,9 @@ def build_pdf(report: BenchReport, path: Path) -> Path:
                 result.exit_geo.country_code or "-",
                 class_label(result.iran_class).split(" (")[0],
                 f"{result.final_score:.1f}",
+                Paragraph(_escape(_normalise_detail(result.detail, 70)), styles["cell"])
+                if not result.alive
+                else "-",
             ]
         )
     if len(rows) == 1:
@@ -712,15 +751,16 @@ def build_pdf(report: BenchReport, path: Path) -> Path:
             rows,
             [
                 7 * mm,
-                44 * mm,
-                14 * mm,
-                15 * mm,
-                34 * mm,
-                14 * mm,
+                36 * mm,
                 13 * mm,
                 12 * mm,
-                25 * mm,
-                14 * mm,
+                30 * mm,
+                13 * mm,
+                12 * mm,
+                11 * mm,
+                20 * mm,
+                13 * mm,
+                24 * mm,
             ],
             align_right=(5, 6, 9),
         )
