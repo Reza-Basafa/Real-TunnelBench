@@ -102,36 +102,6 @@
       "tag": "in-14",
       "listen": "127.0.0.1",
       "listen_port": 20814
-    },
-    {
-      "type": "socks",
-      "tag": "in-15",
-      "listen": "127.0.0.1",
-      "listen_port": 20815
-    },
-    {
-      "type": "socks",
-      "tag": "in-16",
-      "listen": "127.0.0.1",
-      "listen_port": 20816
-    },
-    {
-      "type": "socks",
-      "tag": "in-17",
-      "listen": "127.0.0.1",
-      "listen_port": 20817
-    },
-    {
-      "type": "socks",
-      "tag": "in-18",
-      "listen": "127.0.0.1",
-      "listen_port": 20818
-    },
-    {
-      "type": "socks",
-      "tag": "in-19",
-      "listen": "127.0.0.1",
-      "listen_port": 20819
     }
   ],
   "outbounds": [
@@ -247,18 +217,6 @@
       "tag": "out-5",
       "server": "wwww.qarvian.ir",
       "server_port": 443,
-      "uuid": "34cb3fdc-2f33-49e0-8df3-d5793adf2de6",
-      "packet_encoding": "xudp",
-      "tls": {
-        "enabled": true,
-        "server_name": "wwww.qarvian.ir"
-      }
-    },
-    {
-      "type": "vless",
-      "tag": "out-6",
-      "server": "wwww.qarvian.ir",
-      "server_port": 443,
       "uuid": "37857ebf-94bb-49a0-8ab9-548e64e57311",
       "packet_encoding": "xudp",
       "tls": {
@@ -270,6 +228,25 @@
         "path": "/?TELEGRAM--CNETVPN?ed=2560",
         "headers": {
           "Host": "azdddaiji5.global.ssl.fastly.net."
+        }
+      }
+    },
+    {
+      "type": "vless",
+      "tag": "out-6",
+      "server": "wwww.qarvian.ir",
+      "server_port": 443,
+      "uuid": "3d9d91c0-0a90-471a-a518-a0ff66a1970a",
+      "packet_encoding": "xudp",
+      "tls": {
+        "enabled": true,
+        "server_name": "cdn.akamai.steamstatic.com"
+      },
+      "transport": {
+        "type": "ws",
+        "path": "/",
+        "headers": {
+          "Host": "copy_az_channel_NUFiLTER_7i.global.ssl.fastly.net."
         }
       }
     },
@@ -288,32 +265,13 @@
         "type": "ws",
         "path": "/",
         "headers": {
-          "Host": "copy_az_channel_NUFiLTER_7i.global.ssl.fastly.net."
-        }
-      }
-    },
-    {
-      "type": "vless",
-      "tag": "out-8",
-      "server": "wwww.qarvian.ir",
-      "server_port": 443,
-      "uuid": "3d9d91c0-0a90-471a-a518-a0ff66a1970a",
-      "packet_encoding": "xudp",
-      "tls": {
-        "enabled": true,
-        "server_name": "cdn.akamai.steamstatic.com"
-      },
-      "transport": {
-        "type": "ws",
-        "path": "/",
-        "headers": {
           "Host": "copy_az_channel_NUFiLTER_17i.global.ssl.fastly.net."
         }
       }
     },
     {
       "type": "vless",
-      "tag": "out-9",
+      "tag": "out-8",
       "server": "wwww.qarvian.ir",
       "server_port": 443,
       "uuid": "46cb8a26-0712-4e85-89bf-2538a2788652",
@@ -332,7 +290,7 @@
     },
     {
       "type": "vless",
-      "tag": "out-10",
+      "tag": "out-9",
       "server": "wwww.qarvian.ir",
       "server_port": 443,
       "uuid": "58d2fb1c-7ae2-42c8-8c0d-a393603ebc9f",
@@ -351,7 +309,7 @@
     },
     {
       "type": "vless",
-      "tag": "out-11",
+      "tag": "out-10",
       "server": "wwww.qarvian.ir",
       "server_port": 443,
       "uuid": "58d2fb1c-7ae2-42c8-8c0d-a393603ebc9f",
@@ -370,7 +328,7 @@
     },
     {
       "type": "vless",
-      "tag": "out-12",
+      "tag": "out-11",
       "server": "www.zula.ir",
       "server_port": 443,
       "uuid": "58ea8326-65e1-4848-9ee6-cb6bc8753ba5",
@@ -386,7 +344,7 @@
     },
     {
       "type": "vless",
-      "tag": "out-13",
+      "tag": "out-12",
       "server": "vxc.galardoxtn.ir",
       "server_port": 443,
       "uuid": "5f65c1ae-9e7a-48ea-8ecf-6822365cd177",
@@ -405,7 +363,7 @@
     },
     {
       "type": "vless",
-      "tag": "out-14",
+      "tag": "out-13",
       "server": "wwww.qarvian.ir",
       "server_port": 443,
       "uuid": "64ce5faf-427b-4dd1-926c-6b7ced6b8c38",
@@ -428,7 +386,7 @@
     },
     {
       "type": "vless",
-      "tag": "out-15",
+      "tag": "out-14",
       "server": "wwww.qarvian.ir",
       "server_port": 443,
       "uuid": "69eb5502-0090-47be-a602-2c61c2074d93",
@@ -442,75 +400,6 @@
         "path": "/",
         "headers": {
           "Host": "albaniaoijji.global.ssl.fastly.net"
-        }
-      }
-    },
-    {
-      "type": "vless",
-      "tag": "out-16",
-      "server": "wwww.qarvian.ir",
-      "server_port": 443,
-      "uuid": "69eb5502-0090-47be-a602-2c61c2074d93",
-      "packet_encoding": "xudp",
-      "tls": {
-        "enabled": true,
-        "server_name": "firefox.com"
-      },
-      "transport": {
-        "type": "ws",
-        "path": "/",
-        "headers": {
-          "Host": "snaanjaai.global.ssl.fastly.net"
-        }
-      }
-    },
-    {
-      "type": "vless",
-      "tag": "out-17",
-      "server": "nt.zynexoz.ir",
-      "server_port": 2086,
-      "uuid": "72203c71-32d6-4da8-9b26-a78a261b57ac",
-      "packet_encoding": "xudp",
-      "tls": {
-        "enabled": true,
-        "server_name": "nt.zynexoz.ir"
-      }
-    },
-    {
-      "type": "vless",
-      "tag": "out-18",
-      "server": "wwww.qarvian.ir",
-      "server_port": 443,
-      "uuid": "72881b3f-76f7-4cae-912d-e95e602a5ca4",
-      "packet_encoding": "xudp",
-      "tls": {
-        "enabled": true,
-        "server_name": "cdn.akamai.steamstatic.com"
-      },
-      "transport": {
-        "type": "ws",
-        "path": "/",
-        "headers": {
-          "Host": "copy_az_channel_NUFiLTER_17i.global.ssl.fastly.net."
-        }
-      }
-    },
-    {
-      "type": "vless",
-      "tag": "out-19",
-      "server": "wwww.qarvian.ir",
-      "server_port": 443,
-      "uuid": "72881b3f-76f7-4cae-912d-e95e602a5ca4",
-      "packet_encoding": "xudp",
-      "tls": {
-        "enabled": true,
-        "server_name": "cdn.akamai.steamstatic.com"
-      },
-      "transport": {
-        "type": "ws",
-        "path": "/?TELEGRAM-----TEHRANARGO",
-        "headers": {
-          "Host": "copy_az_channel_NUFiLTER_17i.global.ssl.fastly.net."
         }
       }
     }
@@ -621,41 +510,6 @@
         ],
         "action": "route",
         "outbound": "out-14"
-      },
-      {
-        "inbound": [
-          "in-15"
-        ],
-        "action": "route",
-        "outbound": "out-15"
-      },
-      {
-        "inbound": [
-          "in-16"
-        ],
-        "action": "route",
-        "outbound": "out-16"
-      },
-      {
-        "inbound": [
-          "in-17"
-        ],
-        "action": "route",
-        "outbound": "out-17"
-      },
-      {
-        "inbound": [
-          "in-18"
-        ],
-        "action": "route",
-        "outbound": "out-18"
-      },
-      {
-        "inbound": [
-          "in-19"
-        ],
-        "action": "route",
-        "outbound": "out-19"
       }
     ],
     "final": "out-0",

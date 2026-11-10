@@ -1,8 +1,6 @@
-[31mERROR[0m[0000] [[38;5;137m2063108217[0m 197ms] connection: open connection to www.gstatic.com:443 using outbound/vless[out-5]: unexpected HTTP response status: 500
-[31mERROR[0m[0000] [[38;5;120m1347748456[0m 7ms] connection: open connection to cp.cloudflare.com:80 using outbound/vless[out-5]: unexpected HTTP response status: 500
-[31mERROR[0m[0000] [[38;5;186m59152042[0m 286ms] connection: open connection to www.gstatic.com:443 using outbound/vless[out-4]: unexpected HTTP response status: 404
-[31mERROR[0m[0000] [[38;5;208m3474270144[0m 113ms] connection: open connection to cp.cloudflare.com:80 using outbound/vless[out-4]: unexpected HTTP response status: 404
-[31mERROR[0m[0010] [[38;5;231m2014588160[0m 10.20s] connection: open connection to www.gstatic.com:443 using outbound/vless[out-1]: unexpected HTTP response status: 502
-[31mERROR[0m[0010] [[38;5;110m3817410398[0m 10.21s] connection: open connection to www.gstatic.com:443 using outbound/vless[out-0]: unexpected HTTP response status: 502
-[31mERROR[0m[0020] [[38;5;41m3763836185[0m 10.2s] connection: open connection to cp.cloudflare.com:80 using outbound/vless[out-0]: unexpected HTTP response status: 502
-[31mERROR[0m[0020] [[38;5;226m2196625413[0m 10.35s] connection: open connection to cp.cloudflare.com:80 using outbound/vless[out-1]: unexpected HTTP response status: 502
+[31mERROR[0m[0000] [[38;5;220m2322720204[0m 13ms] connection: open connection to www.gstatic.com:443 using outbound/vless[out-0]: unexpected HTTP response status: 500
+[31mERROR[0m[0000] [[38;5;220m62616012[0m 6ms] connection: open connection to cp.cloudflare.com:80 using outbound/vless[out-0]: unexpected HTTP response status: 500
+[31mERROR[0m[0000] [[38;5;172m1111238556[0m 183ms] connection: open connection to www.gstatic.com:443 using outbound/vless[out-5]: unexpected HTTP response status: 500
+[31mERROR[0m[0000] [[38;5;42m688301338[0m 7ms] connection: open connection to cp.cloudflare.com:80 using outbound/vless[out-5]: unexpected HTTP response status: 500
+[31mERROR[0m[0010] [[38;5;155m187739980[0m 10.6s] connection: open connection to www.gstatic.com:443 using outbound/vless[out-3]: unexpected HTTP response status: 502
+[31mERROR[0m[0020] [[38;5;139m4087670907[0m 10.0s] connection: open connection to cp.cloudflare.com:80 using outbound/vless[out-3]: unexpected HTTP response status: 502
